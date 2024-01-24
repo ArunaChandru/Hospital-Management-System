@@ -4,21 +4,29 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class HospitalManagementSystem {
+
+    //DataBase Details 
     private static final String url = "jdbc:mysql://localhost:3306/hospital";
     private static final String username = "root";
     private static final String password = "2001";
 
     public static void main(String[] args) {
+        
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
         }catch (ClassNotFoundException e){
             e.printStackTrace();
         }
+        
         Scanner scanner = new Scanner(System.in);
+        
         try{
-            Connection connection = DriverManager.getConnection(url, username, password);
+            
+            Connection connection = DriverManager.getConnection(url, username, password);    //Connecting to dataBase
+            
             Patient patient = new Patient(connection, scanner);
             Doctor doctor = new Doctor(connection);
+            
             while(true){
                 System.out.println("HOSPITAL MANAGEMENT SYSTEM ");
                 System.out.println("1. Add Patient");
@@ -69,19 +77,26 @@ public class HospitalManagementSystem {
     public static void bookAppointment(Patient patient, Doctor doctor, Connection connection, Scanner scanner){
         System.out.print("Enter Patient Id: ");
         int patientId = scanner.nextInt();
+        
         System.out.print("Enter Doctor Id: ");
         int doctorId = scanner.nextInt();
+        
         System.out.print("Enter appointment date (YYYY-MM-DD): ");
         String appointmentDate = scanner.next();
+        
         if(patient.getPatientById(patientId) && doctor.getDoctorById(doctorId)){
-            if(doctor.checkDoctorAvailability(doctorId, appointmentDate, connection)){
-                String appointmentQuery = "INSERT INTO appointments(patient_id, doctor_id, appointment_date) VALUES(?, ?, ?)";
+            if(doctor.checkDoctorAvailability(doctorId, appointmentDate, connection))
+            {
+                String appointmentQuery = "INSERT INTO appointments(patient_id, doctor_id, appointment_date) VALUES(?, ?, ?)";        //Sql Quert to insert the detail of appointment
+               
                 try {
                     PreparedStatement preparedStatement = connection.prepareStatement(appointmentQuery);
+                    
                     preparedStatement.setInt(1, patientId);
                     preparedStatement.setInt(2, doctorId);
                     preparedStatement.setString(3, appointmentDate);
                     int rowsAffected = preparedStatement.executeUpdate();
+                    
                     if(rowsAffected>0){
                         System.out.println("Appointment Booked!");
                     }else{
